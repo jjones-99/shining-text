@@ -1,5 +1,6 @@
 import "./style.css";
 import * as THREE from "three";
+import gsap from "gsap";
 
 // ===== QUERY DOM
 const canvas = document.querySelector<HTMLCanvasElement>("#three-canvas")!;
@@ -10,6 +11,9 @@ const containerWidth = canvasContainer.offsetWidth;
 const containerHeight = canvasContainer.offsetHeight;
 const containerRatio = containerWidth / containerHeight;
 const pixelRatio = window.devicePixelRatio;
+const mouse: { x?: number; y?: number } = { x: undefined, y: undefined };
+
+// ===== SETUP variables
 
 // ===== SETUP three.js
 const scene = new THREE.Scene();
@@ -40,5 +44,16 @@ mainGroup.add(cube);
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
+  gsap.to(mainGroup.rotation, {
+    y: mouse.y!,
+    x: -mouse.x!,
+    duration: 2,
+  });
 }
 animate();
+
+// ===== Mouse listener for rotation
+addEventListener("mousemove", (ev) => {
+  mouse.y = (ev.clientX / innerWidth) * 2 - 1;
+  mouse.x = -(ev.clientY / innerHeight) * 2 + 1;
+});
