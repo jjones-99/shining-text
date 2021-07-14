@@ -44,7 +44,24 @@ scene.add(mainGroup);
 const planeGeometry = new THREE.PlaneGeometry(2, 2);
 const planeMaterial = new THREE.ShaderMaterial({
   vertexShader,
-  fragmentShader
+  fragmentShader,
+  uniforms: {
+    u_textureJared: {
+      value: textureJared,
+    },
+    u_pxaspect: {
+      value: PIXEL_RATIO,
+    },
+    u_resolution: {
+      value: new THREE.Vector2(),
+    },
+    u_time: {
+      value: 1.0,
+    },
+    u_mouse: {
+      value: new THREE.Vector2(-0.1, -0.1),
+    },
+  },
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 mainGroup.add(plane);
