@@ -7,13 +7,13 @@ const canvas = document.querySelector<HTMLCanvasElement>("#three-canvas")!;
 const canvasContainer = document.querySelector<HTMLDivElement>("#three-container")!;
 
 // ===== SETUP constants
-const containerWidth = canvasContainer.offsetWidth;
-const containerHeight = canvasContainer.offsetHeight;
-const containerRatio = containerWidth / containerHeight;
-const pixelRatio = window.devicePixelRatio;
+const ROTATE_WITH_MOUSE = false;
+const PIXEL_RATIO = window.devicePixelRatio;
 const mouse: { x?: number; y?: number } = { x: undefined, y: undefined };
 
 // ===== SETUP variables
+let containerWidth = canvasContainer.offsetWidth;
+let containerHeight = canvasContainer.offsetHeight;
 
 // ===== SETUP three.js
 const scene = new THREE.Scene();
@@ -22,10 +22,14 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
 });
 renderer.setSize(containerWidth, containerHeight);
-renderer.setPixelRatio(pixelRatio);
+renderer.setPixelRatio(PIXEL_RATIO);
+
+// ===== LOAD textures
+const textureLoader = new THREE.TextureLoader();
+const textureJared = textureLoader.load("./assets/jared.jpg");
 
 // ===== CAMERA
-const camera = new THREE.PerspectiveCamera(75, containerRatio, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
 camera.position.z = 6;
 
 // ===== GROUP
@@ -33,22 +37,25 @@ const mainGroup = new THREE.Group();
 scene.add(mainGroup);
 
 // ===== CUBE
-const cubeGeometry = new THREE.BoxGeometry(2, 2, 2, 3, 3, 3);
-const cubeMaterial = new THREE.MeshBasicMaterial({
+const planeGeometry = new THREE.PlaneGeometry(2, 2);
+const planeMaterial = new THREE.MeshBasicMaterial({
   color: 0xff0000,
+  map: textureJared,
 });
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-mainGroup.add(cube);
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+mainGroup.add(plane);
 
 // ===== Render/animate three.js.
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
-  gsap.to(mainGroup.rotation, {
-    y: mouse.y!,
-    x: -mouse.x!,
-    duration: 2,
-  });
+  if (ROTATE_WITH_MOUSE) {
+    gsap.to(mainGroup.rotation, {
+      y: mouse.y!,
+      x: -mouse.x!,
+      duration: 2,
+    });
+  }
 }
 animate();
 
@@ -57,3 +64,12 @@ addEventListener("mousemove", (ev) => {
   mouse.y = (ev.clientX / innerWidth) * 2 - 1;
   mouse.x = -(ev.clientY / innerHeight) * 2 + 1;
 });
+
+// ===== Handle window resize
+window.onresize = () => {
+  containerWidth = canvasContainer.offsetWidth;
+  containerHeight = canvasContainer.offsetHeight;
+  renderer.setSize(containerWidth, containerHeight);
+  camera.aspect = containerWidth / containerHeight;
+  camera.updateProjectionMatrix();
+};
