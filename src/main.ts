@@ -1,6 +1,10 @@
 import "./style.css";
 import * as THREE from "three";
 import gsap from "gsap";
+// @ts-ignore
+import vertexShader from "../shaders/vertex.glsl";
+// @ts-ignore
+import fragmentShader from "../shaders/fragment.glsl";
 
 // ===== QUERY DOM
 const canvas = document.querySelector<HTMLCanvasElement>("#three-canvas")!;
@@ -38,9 +42,9 @@ scene.add(mainGroup);
 
 // ===== CUBE
 const planeGeometry = new THREE.PlaneGeometry(2, 2);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
-  map: textureJared,
+const planeMaterial = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 mainGroup.add(plane);
