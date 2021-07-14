@@ -1,6 +1,5 @@
 import "./style.css";
 import * as THREE from "three";
-import gsap from "gsap";
 // @ts-ignore
 import vertexShader from "../shaders/vertex.glsl";
 // @ts-ignore
@@ -11,9 +10,7 @@ const canvas = document.querySelector<HTMLCanvasElement>("#three-canvas")!;
 const canvasContainer = document.querySelector<HTMLDivElement>("#three-container")!;
 
 // ===== SETUP constants
-const ROTATE_WITH_MOUSE = false;
 const PIXEL_RATIO = window.devicePixelRatio;
-const mouse: { x?: number; y?: number } = { x: undefined, y: undefined };
 
 // ===== SETUP variables
 let containerWidth = canvasContainer.offsetWidth;
@@ -50,6 +47,8 @@ const uniforms = {
     value: new THREE.Vector2(-0.1, -0.1),
   },
 };
+uniforms.u_resolution.value.x = renderer.domElement.width;
+uniforms.u_resolution.value.y = renderer.domElement.height;
 
 // ===== CAMERA
 const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
@@ -73,13 +72,6 @@ mainGroup.add(plane);
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
-  if (ROTATE_WITH_MOUSE) {
-    gsap.to(mainGroup.rotation, {
-      y: -uniforms.u_mouse.value.y!,
-      x: -uniforms.u_mouse.value.x!,
-      duration: 2,
-    });
-  }
 }
 animate();
 
@@ -88,13 +80,14 @@ document.addEventListener("pointermove", (ev) => {
   let ratio = window.innerHeight / window.innerWidth;
   uniforms.u_mouse.value.x = (ev.pageX - window.innerWidth / 2) / window.innerWidth / ratio;
   uniforms.u_mouse.value.y = ((ev.pageY - window.innerHeight / 2) / window.innerHeight) * -1;
+  ev.preventDefault();
 });
 
 // ===== Handle window resize
 window.onresize = () => {
-  containerWidth = canvasContainer.offsetWidth;
-  containerHeight = canvasContainer.offsetHeight;
-  renderer.setSize(containerWidth, containerHeight);
-  camera.aspect = containerWidth / containerHeight;
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  uniforms.u_resolution.value.x = renderer.domElement.width;
+  uniforms.u_resolution.value.y = renderer.domElement.height;
+  camera.aspect = uniforms.u_resolution.value.x / uniforms.u_resolution.value.y;
   camera.updateProjectionMatrix();
 };
