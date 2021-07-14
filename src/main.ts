@@ -32,6 +32,25 @@ renderer.setPixelRatio(PIXEL_RATIO);
 const textureLoader = new THREE.TextureLoader();
 const textureJared = textureLoader.load("./assets/jared.jpg");
 
+// ===== SHADER
+const uniforms = {
+  u_textureJared: {
+    value: textureJared,
+  },
+  u_pxaspect: {
+    value: PIXEL_RATIO,
+  },
+  u_resolution: {
+    value: new THREE.Vector2(),
+  },
+  u_time: {
+    value: 1.0,
+  },
+  u_mouse: {
+    value: new THREE.Vector2(-0.1, -0.1),
+  },
+};
+
 // ===== CAMERA
 const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
 camera.position.z = 6;
@@ -41,27 +60,11 @@ const mainGroup = new THREE.Group();
 scene.add(mainGroup);
 
 // ===== CUBE
-const planeGeometry = new THREE.PlaneGeometry(2, 2);
+const planeGeometry = new THREE.PlaneGeometry(20, 20);
 const planeMaterial = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
-  uniforms: {
-    u_textureJared: {
-      value: textureJared,
-    },
-    u_pxaspect: {
-      value: PIXEL_RATIO,
-    },
-    u_resolution: {
-      value: new THREE.Vector2(),
-    },
-    u_time: {
-      value: 1.0,
-    },
-    u_mouse: {
-      value: new THREE.Vector2(-0.1, -0.1),
-    },
-  },
+  uniforms,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 mainGroup.add(plane);
@@ -72,8 +75,8 @@ function animate() {
   renderer.render(scene, camera);
   if (ROTATE_WITH_MOUSE) {
     gsap.to(mainGroup.rotation, {
-      y: mouse.y!,
-      x: -mouse.x!,
+      y: -uniforms.u_mouse.value.y!,
+      x: -uniforms.u_mouse.value.x!,
       duration: 2,
     });
   }
@@ -81,9 +84,10 @@ function animate() {
 animate();
 
 // ===== Mouse listener for rotation
-addEventListener("mousemove", (ev) => {
-  mouse.y = (ev.clientX / innerWidth) * 2 - 1;
-  mouse.x = -(ev.clientY / innerHeight) * 2 + 1;
+document.addEventListener("pointermove", (ev) => {
+  let ratio = window.innerHeight / window.innerWidth;
+  uniforms.u_mouse.value.x = (ev.pageX - window.innerWidth / 2) / window.innerWidth / ratio;
+  uniforms.u_mouse.value.y = ((ev.pageY - window.innerHeight / 2) / window.innerHeight) * -1;
 });
 
 // ===== Handle window resize
