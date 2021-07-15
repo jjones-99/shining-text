@@ -11,6 +11,8 @@ const canvasContainer = document.querySelector<HTMLDivElement>("#three-container
 
 // ===== SETUP constants
 const PIXEL_RATIO = window.devicePixelRatio;
+const MASK_URL = "./assets/the best.jpg";
+const NOISE_URL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/982762/noise.png";
 
 // ===== SETUP variables
 let containerWidth = canvasContainer.offsetWidth;
@@ -27,12 +29,16 @@ renderer.setPixelRatio(PIXEL_RATIO);
 
 // ===== LOAD textures
 const textureLoader = new THREE.TextureLoader();
-const textureJared = textureLoader.load("./assets/jared.jpg");
+const textureMask = textureLoader.load(MASK_URL);
+const textureNoise = textureLoader.load(NOISE_URL);
+textureNoise.wrapS = THREE.RepeatWrapping;
+textureNoise.wrapT = THREE.RepeatWrapping;
+textureNoise.minFilter = THREE.LinearFilter;
 
 // ===== SHADER
 const uniforms = {
-  u_textureJared: {
-    value: textureJared,
+  u_textureMask: {
+    value: textureMask,
   },
   u_pxaspect: {
     value: PIXEL_RATIO,
@@ -45,6 +51,9 @@ const uniforms = {
   },
   u_mouse: {
     value: new THREE.Vector2(-0.1, -0.1),
+  },
+  u_noise: {
+    value: textureNoise,
   },
 };
 uniforms.u_resolution.value.x = renderer.domElement.width;
@@ -85,7 +94,7 @@ document.addEventListener("pointermove", (ev) => {
 
 // ===== Handle window resize
 window.onresize = () => {
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
   uniforms.u_resolution.value.x = renderer.domElement.width;
   uniforms.u_resolution.value.y = renderer.domElement.height;
   camera.aspect = uniforms.u_resolution.value.x / uniforms.u_resolution.value.y;
