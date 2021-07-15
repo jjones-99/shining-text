@@ -6,15 +6,16 @@ uniform sampler2D u_noise;
 uniform sampler2D u_textureMask;
 uniform bool u_mousemoved;
 
-const float DECAY = .75; // the amount to decay each sample by
+const bool INVERT_MASK = true;
+const float DECAY = .7; // the amount to decay each sample by
 const float EXPOSURE = .35; // the screen exposure
-const float LIGHT_STRENGTH = 3.5;
+const float LIGHT_STRENGTH = 1.5;
 const vec3 LIGHT_COLOR = vec3(1.5, 1.6, .6); // the colour of the light
 const vec3 FALLOFF_COLOR = vec3(2.0, 1.0, 0.); // the colour of the falloff
 const vec3 BASE_COLOR = vec3(.25, 0.25, .25); // the base colour of the render
 const float FALLOFF = .5;
 const int SAMPLES = 15; // The number of samples to take
-const float DENSITY = .3; // The density of the "smoke"
+const float DENSITY = .8; // The density of the "smoke"
 const float WEIGHT = .25; // how heavily to apply each step of the supersample
 const float SCALE = 2.;
 
@@ -24,7 +25,9 @@ float randomFrom2D(vec2 uv) {
 }
 
 float getMask(vec2 uv) {
-  return texture2D(u_textureMask, (uv) + .5, -1.).x;
+  float value = texture2D(u_textureMask, (uv) + .5, -1.).x;
+  if (INVERT_MASK) return 1. - value;
+  return value;
 }
 
 float getOcclusion(float distanceFromLight, float mask) {
