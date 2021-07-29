@@ -11,8 +11,11 @@ const canvasContainer = document.querySelector<HTMLDivElement>("#three-container
 
 // ===== SETUP constants
 const PIXEL_RATIO = window.devicePixelRatio;
-const MASK_URL = "./assets/the best.jpg";
-const NOISE_URL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/982762/noise.png";
+const MASK_URL = "./assets/jared.jpg";
+// Photo by [Ivan Gromov](https://unsplash.com/@creativesuppliesco) of Unsplash.
+// const BASE_URL = "./assets/ivan-gromov-Y3vPEuNlf7w-unsplash.jpg";
+// Photo by [Marjan Blan](https://unsplash.com/@marjan_blan)
+const BASE_URL = "./assets/marjan-blan-marjanblan-794QUz5-cso-unsplash.jpg"
 
 // ===== SETUP variables
 let containerWidth = canvasContainer.offsetWidth;
@@ -30,10 +33,14 @@ renderer.setPixelRatio(PIXEL_RATIO);
 // ===== LOAD textures
 const textureLoader = new THREE.TextureLoader();
 const textureMask = textureLoader.load(MASK_URL);
-const textureNoise = textureLoader.load(NOISE_URL);
+const textureNoise: any = {}; //textureLoader.load(NOISE_URL);
 textureNoise.wrapS = THREE.RepeatWrapping;
 textureNoise.wrapT = THREE.RepeatWrapping;
 textureNoise.minFilter = THREE.LinearFilter;
+const textureBase = textureLoader.load(BASE_URL);
+textureBase.wrapS = THREE.RepeatWrapping;
+textureBase.wrapT = THREE.RepeatWrapping;
+textureBase.minFilter = THREE.LinearFilter;
 
 // ===== SHADER
 const uniforms = {
@@ -52,8 +59,11 @@ const uniforms = {
   u_mouse: {
     value: new THREE.Vector2(-0.1, -0.1),
   },
-  u_noise: {
+  u_textureNoise: {
     value: textureNoise,
+  },
+  u_textureBase: {
+    value: textureBase,
   },
 };
 uniforms.u_resolution.value.x = renderer.domElement.width;

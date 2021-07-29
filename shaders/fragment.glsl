@@ -2,22 +2,26 @@ uniform vec2 u_resolution;
 uniform float u_pxaspect;
 uniform vec2 u_mouse;
 uniform float u_time;
-uniform sampler2D u_noise;
+uniform sampler2D u_textureNoise;
 uniform sampler2D u_textureMask;
+uniform sampler2D u_textureBase;
 uniform bool u_mousemoved;
 
-const bool INVERT_MASK = true;
-const float DECAY = .7; // the amount to decay each sample by
-const float EXPOSURE = .35; // the screen exposure
-const float LIGHT_STRENGTH = 1.5;
-const vec3 LIGHT_COLOR = vec3(1.5, 1.6, .6); // the colour of the light
-const vec3 FALLOFF_COLOR = vec3(2.0, 1.0, 0.); // the colour of the falloff
-const vec3 BASE_COLOR = vec3(.25, 0.25, .25); // the base colour of the render
-const float FALLOFF = .5;
-const int SAMPLES = 15; // The number of samples to take
-const float DENSITY = .8; // The density of the "smoke"
-const float WEIGHT = .25; // how heavily to apply each step of the supersample
-const float SCALE = 2.;
+varying vec2 vertexUV;
+
+const bool INVERT_MASK = false; // Invert the meaning of the mask in terms of occlusion. true = black represents "holes".
+const float DECAY = .7; // Multiplicative decay of illumination each iteration. Higher = further brighter light.
+const float EXPOSURE = .35; // Overall exposure for the light. 
+const float LIGHT_STRENGTH = 1.5; // The further the light travels from the source (not iterations, just the base aura.)
+const vec3 LIGHT_COLOR = vec3(1.5, 1.6, .6); // When the pixel is closer to the light source, more of this color.
+const vec3 FALLOFF_COLOR = vec3(2.0, 1.0, 0.); // As the pixel is further from the light source, more of this color.
+const vec3 BACKGROUND_COLOR = vec3(.25, 0.25, .25); // The base color of the background (unused with u_textureBase).
+const vec3 BASE_MASK_COLOR = vec3(-0.4251, -0.4416, -0.4276); // The base color to use where the mask is 'active'.
+const float FALLOFF = .9; // Strength of the falloff color.
+const int SAMPLES = 25; // Number of iterations of light movement. Higher = smoother light.
+const float DENSITY = .8; // Amount that the light is 'caught in the air'. Higher numbers mean beams travel further.
+const float WEIGHT = .25; // Strength of each iteration. Higher = stronger beams.
+const float SCALE = 2.; // Inverse scale of the texture on the screen. Higher = smaller
 
 float randomFrom2D(vec2 uv) {
   // from https://thebookofshaders.com/10/
@@ -32,6 +36,10 @@ float getMask(vec2 uv) {
 
 float getOcclusion(float distanceFromLight, float mask) {
   return (1. - smoothstep(0.0, LIGHT_STRENGTH, distanceFromLight)) * (1. - mask);
+}
+
+vec4 getBase(vec2 uv) {
+  return texture2D(u_textureBase, uv);
 }
 
 void main() {
@@ -75,7 +83,9 @@ void main() {
 
   vec3 lightColor = mix(LIGHT_COLOR, FALLOFF_COLOR, distanceFromLight * FALLOFF);
 
-  vec3 colour = vec3(BASE_COLOR + occlusion * EXPOSURE * lightColor);
+  vec3 baseMaskColor = (1. - mask) * BASE_MASK_COLOR;
+  vec4 baseColor = getBase(vertexUV);
+  vec3 color = vec3(baseColor.xyz + baseMaskColor.xyz + occlusion * EXPOSURE * lightColor);
   
-  gl_FragColor = vec4(colour,1.0);
+  gl_FragColor = vec4(color,1.0);
 }
