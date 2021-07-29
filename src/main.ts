@@ -15,7 +15,7 @@ const MASK_URL = "./assets/jared.jpg";
 // Photo by [Ivan Gromov](https://unsplash.com/@creativesuppliesco) of Unsplash.
 // const BASE_URL = "./assets/ivan-gromov-Y3vPEuNlf7w-unsplash.jpg";
 // Photo by [Marjan Blan](https://unsplash.com/@marjan_blan)
-const BASE_URL = "./assets/marjan-blan-marjanblan-794QUz5-cso-unsplash.jpg"
+const BASE_URL = "./assets/marjan-blan-marjanblan-794QUz5-cso-unsplash.jpg";
 
 // ===== SETUP variables
 let containerWidth = canvasContainer.offsetWidth;
@@ -47,14 +47,8 @@ const uniforms = {
   u_textureMask: {
     value: textureMask,
   },
-  u_pxaspect: {
-    value: PIXEL_RATIO,
-  },
   u_resolution: {
     value: new THREE.Vector2(),
-  },
-  u_time: {
-    value: 1.0,
   },
   u_mouse: {
     value: new THREE.Vector2(-0.1, -0.1),
