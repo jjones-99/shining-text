@@ -1,6 +1,8 @@
 # shining-text
 A shining text experiment for three.js, vite, and tailwindcss. This is meant to somewhat mimic the effect that may be used to represent "magic writing" on a scroll, for example.
 
+![demo of the project](https://github.com/jjones-99/shining-text/blob/main/demo/ShiningText.gif?raw=true)
+
 ## Instructions
 
 A CodePen for this project exists [here](https://codepen.io/jaredcj/pen/ZEKBmMQ). 
