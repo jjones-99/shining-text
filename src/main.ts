@@ -1,9 +1,9 @@
 import "./style.css";
 import * as THREE from "three";
 // @ts-ignore
-import vertexShader from "../shaders/vertex.glsl";
+import vertexShader from "./shaders/vertex.glsl";
 // @ts-ignore
-import fragmentShader from "../shaders/fragment.glsl";
+import fragmentShader from "./shaders/fragment.glsl";
 
 // ! CHANGE THESE to experiment with different images.
 // The mask does not need to be black and white.
