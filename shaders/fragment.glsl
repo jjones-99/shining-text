@@ -21,6 +21,7 @@ uniform bool u_invertMask; // Invert the meaning of the mask in terms of occlusi
 // From vertex.glsl
 varying vec2 vertexUV; // We normally calculate uv with resolution/SCALE, but this is the plain one passed to vertex.glsl.
 
+// Configuration
 const float DECAY = .7; // Multiplicative decay of illumination each iteration. Higher = further brighter light.
 const float EXPOSURE = .35; // Overall exposure for the light. 
 const float LIGHT_STRENGTH = 1.5; // The further the light travels from the source (not iterations, just the base aura.)
